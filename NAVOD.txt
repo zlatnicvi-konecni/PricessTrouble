@@ -1,0 +1,72 @@
+PRINCEZNIČKY – ZTRACENÝ ZUB | verze 1.6 – Zlatý zub
+
+SPUŠTĚNÍ NA POČÍTAČI
+Rozbal celý ZIP do jedné složky. Otevři index.html v aktuálním prohlížeči.
+Složku assets a soubory game.js a style.css nech vedle index.html.
+Hra je samostatná: nepotřebuje Apps Script, tabulku, instalaci ani externí knihovny.
+
+OVLÁDÁNÍ
+Šipky nebo A/D: doleva/doprava. Mezerník: skok a dvojskok. Mimo řetěz fungují pro skok také W a šipka nahoru.
+Na dlouhém řetězu: šipka nahoru / W = šplhat, šipka dolů / S = slézat.
+Mezerníkem z řetězu odskočíš; šipkou vlevo/vpravo zvolíš směr.
+Telefon: ⇧ je šplhání, ⤴ je skok i odskok z řetězu.
+Shift + směr: rychlé kutálení a rozbití popraskané sádry.
+Pružina na stole automaticky vystřelí princezničku výš.
+Z levého kovového bloku skoč k řetízku, nech se přenést doprava a odskoč na vyšší plošinu.
+Sbírej 22 bonusových granátů; k dokončení nejsou nutné všechny.
+1. Ze stolu propadni otvorem na podlahu.
+2. Přeskoč prsteny a kamínky, rozbij sádru při vstupu/výstupu pod skříní.
+3. Na konci podlahy skoč na dlouhý řetěz, vyšplhej vzhůru a odskoč doprava
+   na vysokou plošinu. Pokračováním doprava vstoupíš na poličky.
+4. Na poličce pokračuj doprava přes pravítka a pilníky, vyšplhej po dalším
+   řetězu a odskoč tentokrát doleva. Pomoci může dvojskok.
+5. Vracej se horní cestou doleva, rozbij kružítko kutálením a vezmi ZLATÝ ZUB.
+6. Princezna se zvětší, sfoukne svíčku a zobrazí se konec hry.
+Už v první části padají častěji přívěsky a kameny. Obojí ubírá životy.
+Ptáci ve všech částech zůstávají neškodnou dekorací. Červený stín a vykřičník varují před dopadem.
+Po zásahu máš krátkou ochranu; po třetím zásahu můžeš začít znovu.
+Esc: pauza. Tlačítko Zvuk zapíná jednoduché zvukové efekty.
+Telefon: dotyková tlačítka, doporučená orientace na šířku.
+
+KAM NAHRÁT SOUBORY – GITHUB PAGES
+1. Na GitHubu vytvoř NOVÝ veřejný repozitář, například princeznicky.
+2. Add file > Upload files: nahraj OBSAH rozbaleného ZIPu, včetně složky assets.
+   Index.html musí být v kořeni repozitáře. Nenahrávej pouze ZIP.
+   Přetáhnutí složky assets do nahrávacího okna zachová její podsložku.
+3. Ulož tlačítkem Commit changes.
+4. Settings > Pages > Build and deployment > Source: Deploy from a branch.
+5. Branch: main. Folder: /(root). Save.
+6. Po nasazení zkopíruj skutečnou adresu uvedenou v Settings > Pages.
+   Obvykle má tvar https://TVUJ-UCET.github.io/princeznicky/.
+   Zveřejnění může trvat několik minut. Otevři adresu a zkontroluj obrázky i hru.
+
+VLOŽENÍ NA WIX
+Přidej prvek Vložit web / Embed a site a vlož veřejnou HTTPS adresu hry.
+Nebo použij Vložit HTML a tento kód, kde nahradíš ADRESA_HRY skutečnou URL:
+
+<iframe src="ADRESA_HRY" title="Princezničky – Ztracený zub"
+  style="width:100%;height:650px;border:0;border-radius:16px"
+  allow="fullscreen" allowfullscreen></iframe>
+
+Výšku okna ve Wixu uprav také v editoru. Na mobilní stránce přidej i odkaz
+Otevřít hru samostatně; malé vložené okno nemusí být pohodlné.
+Soukromý zkušební odkaz vyžadující přihlášení není určený pro veřejné vložení.
+
+ÚPRAVY
+game.js: pohyb, plošiny a pozice granátů. style.css: tlačítka a textová rozhraní.
+assets/bench.png: fotografický podklad. assets/princess.png: samostatná postava.
+Úseky definují tablePlatforms, floorPlatforms a shelfPlatforms v game.js.
+
+STAV VERZE
+Fotografický stůl a princeznička jsou grafické podklady vytvořené podle návrhu
+z dodaných fotek, nikoli přesná nepozměněná fotografie celého stolu.
+Ptáčci, přívěsky a padající granáty jsou upravené podle dodaných fotek.
+Plošiny používají fotorealistické obrázky podle dodaného stolu. Řetízek je kreslený kódem. Řetízek se pravidelně houpá a nese zavěšenou princezničku. Jde o řízený kyvadlový pohyb; jednotlivá oka nemají samostatnou fyzikální simulaci. Dlouhé řetězy dovolují šplhat a kamera sleduje výšku.
+Skóre a postup se neukládají po zavření. Hra neodesílá žádná herní data.
+Ověřena syntaxe a simulace pohybu, skoku, doskoku, pružiny, výstupu po řetízku,
+rozražení překážky, sbírání a výhry. V tomto prostředí neproběhl test skutečného
+vykreslení a dotykového ovládání v prohlížeči; ty je potřeba vyzkoušet na zařízení.
+
+Oficiální návody:
+https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+https://support.wix.com/en/article/wix-editor-embedding-a-site-or-a-widget
