@@ -1,1 +1,0 @@
-(()=>{const dialog=document.querySelector('#filmDialog'),film=document.querySelector('#elaFilm'),open=document.querySelector('#filmOpen');open.onclick=()=>{dialog.showModal();film.play().catch(()=>{});};document.querySelector('#filmClose').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{film.pause();open.focus();});})();
