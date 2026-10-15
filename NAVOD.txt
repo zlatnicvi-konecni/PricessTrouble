@@ -1,4 +1,6 @@
-PRINCEZNIČKY – ZTRACENÝ ZUB | verze 1.6 – Zlatý zub
+NOVINKY v1.7: Šplhání funguje i na prvním řetězu. Úvod má méně padajících předmětů; další části jsou hustší. Okolí dlouhých řetězů je bez padajících předmětů. Finále má větší princeznu a poryv větru s unášenými částicemi, ohýbáním plamene a kouřem.
+
+PRINCEZNIČKY – ZTRACENÝ ZUB | verze 1.7 – Zlatý zub
 
 SPUŠTĚNÍ NA POČÍTAČI
 Rozbal celý ZIP do jedné složky. Otevři index.html v aktuálním prohlížeči.
@@ -7,7 +9,7 @@ Hra je samostatná: nepotřebuje Apps Script, tabulku, instalaci ani externí kn
 
 OVLÁDÁNÍ
 Šipky nebo A/D: doleva/doprava. Mezerník: skok a dvojskok. Mimo řetěz fungují pro skok také W a šipka nahoru.
-Na dlouhém řetězu: šipka nahoru / W = šplhat, šipka dolů / S = slézat.
+Na každém řetězu: šipka nahoru / W = šplhat, šipka dolů / S = slézat.
 Mezerníkem z řetězu odskočíš; šipkou vlevo/vpravo zvolíš směr.
 Telefon: ⇧ je šplhání, ⤴ je skok i odskok z řetězu.
 Shift + směr: rychlé kutálení a rozbití popraskané sádry.
