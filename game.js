@@ -101,12 +101,25 @@ function princess(x,y,a=0,scale=1){ctx.save();ctx.translate(x,y);ctx.rotate(a);c
 function drawTool(b){let a=img[b.kind],r=toolBounds[b.kind];ctx.drawImage(a,...r,b.x,b.y,b.w,b.h);}
 // A single front incisor: broad crown, straight cutting edge, no molar roots.
 function drawIncisor(x,y,w,h,a=0){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.scale(w/40,h/48);let gold=ctx.createLinearGradient(-20,0,20,0);gold.addColorStop(0,'#82500f');gold.addColorStop(.25,'#ffe4a0');gold.addColorStop(.55,'#e8b849');gold.addColorStop(.8,'#fff1b7');gold.addColorStop(1,'#a96b18');ctx.fillStyle=gold;ctx.strokeStyle='#70470d';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-14,-23);ctx.quadraticCurveTo(0,-28,14,-23);ctx.quadraticCurveTo(20,-18,18,-7);ctx.lineTo(16,20);ctx.quadraticCurveTo(0,24,-16,20);ctx.lineTo(-18,-7);ctx.quadraticCurveTo(-20,-18,-14,-23);ctx.closePath();ctx.fill();ctx.stroke();ctx.strokeStyle='#fff2ba';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-11,-16);ctx.quadraticCurveTo(-14,0,-11,15);ctx.stroke();ctx.restore()}
+// Exhibits are scenery, not collision obstacles. Both gallery routes belong to chapter 3.
+// The upper route runs right to left; the pile of rings is its final exhibit.
 const exhibits=[
-[1,580,385,0],[1,1850,300,3],[1,2810,325,7],[1,3590,363,8],
-[2,430,510,1],[2,850,510,5],[2,2620,510,9],
-[3,650,-190,2],[3,940,-190,4],[3,1240,-190,6],[3,1450,-220,10],[3,1660,-220,11],[3,1850,-190,12],[3,2020,-190,13],[3,2180,-190,14]];
-function drawGallery(){for(const [level,x,base,id] of exhibits){if(stage!==level||x<cam-180||x>cam+vw+180)continue;const a=img['gallery'+id];if(!a)continue;let height=level===3?100:72,top=base-height,w=level===3?132:112,photoH=100;ctx.save();ctx.fillStyle='#0005';ctx.beginPath();ctx.ellipse(x,base+4,w*.6,8,0,0,7);ctx.fill();let velvet=ctx.createLinearGradient(x-w/2,0,x+w/2,0);velvet.addColorStop(0,'#111d23');velvet.addColorStop(.5,'#33464b');velvet.addColorStop(1,'#101a20');ctx.fillStyle=velvet;ctx.fillRect(x-w/2,top,w,height);ctx.fillStyle='#ba9b60';ctx.fillRect(x-w/2-4,top,w+8,4);ctx.fillStyle='#eeeae2';ctx.fillRect(x-w/2-2,top-photoH-5,w+4,photoH+4);ctx.fillStyle='#fff';ctx.fillRect(x-w/2,top-photoH-3,w,photoH);const ratio=Math.min((w-8)/a.width,(photoH-8)/a.height),iw=a.width*ratio,ih=a.height*ratio;ctx.drawImage(a,x-iw/2,top-photoH/2-3-ih/2,iw,ih);ctx.fillStyle='#dec58d';ctx.textAlign='center';ctx.font='10px Georgia';ctx.fillText('ELA ZOLO',x,top+23);ctx.restore()}
-if(stage===3){ctx.save();ctx.fillStyle='#dec58d';ctx.textAlign='center';ctx.font='23px Georgia';ctx.fillText('ELA ZOLO · GALERIE',1510,-470);ctx.font='12px Georgia';ctx.fillText('Autorské šperky z Olomouce',1510,-447);ctx.restore()}}
+[3,240,510,0],[3,520,510,1],[3,800,510,2],[3,1080,510,3],
+[3,1360,510,5],[3,1640,510,6],[3,1920,510,7],[3,2200,510,8],
+[3,2070,-190,9],[3,1830,-190,10],[3,1570,-220,11],
+[3,1300,-190,12],[3,1040,-190,13],[3,790,-190,14],[3,530,-190,4]];
+const galleryCrops=[[502, 543, 2180, 1051], [736, 407, 932, 985], [835, 388, 925, 927], [592, 363, 1168, 993], [168, 44, 2332, 1482], [823, 430, 841, 969], [0, 49, 1577, 1191], [396, 385, 1397, 606], [577, 1240, 4445, 1600], [2063, 701, 1920, 2160], [151, 0, 1692, 1335], [149, 141, 1618, 1966], [263, 403, 2066, 2335], [39, 58, 270, 245], [209, 178, 2134, 2112]];
+function drawGallery(){if(stage!==3)return;
+for(const [level,x,base,id] of exhibits){if(x<cam-200||x>cam+vw+200)continue;const a=img['gallery'+id];if(!a)continue;
+const pile=id===4,height=62+(id%3)*14,top=base-height,w=pile?280:220,photoH=pile?205:185;
+ctx.save();ctx.fillStyle='#0005';ctx.beginPath();ctx.ellipse(x,base+4,w*.55,8,0,0,7);ctx.fill();
+let velvet=ctx.createLinearGradient(x-w/2,0,x+w/2,0);velvet.addColorStop(0,'#111d23');velvet.addColorStop(.5,'#33464b');velvet.addColorStop(1,'#101a20');ctx.fillStyle=velvet;ctx.fillRect(x-w/2,top,w,height);
+ctx.fillStyle='#ba9b60';ctx.fillRect(x-w/2-4,top,w+8,4);ctx.fillStyle='#eeeae2';ctx.fillRect(x-w/2-2,top-photoH-5,w+4,photoH+4);ctx.fillStyle='#fff';ctx.fillRect(x-w/2,top-photoH-3,w,photoH);
+// Frame the product more closely, using the unchanged original image.
+const [sx,sy,sw,sh]=galleryCrops[id],ratio=Math.min((w-12)/sw,(photoH-12)/sh),iw=sw*ratio,ih=sh*ratio;
+ctx.drawImage(a,sx,sy,sw,sh,x-iw/2,top-photoH/2-3-ih/2,iw,ih);
+ctx.fillStyle='#dec58d';ctx.textAlign='center';ctx.font='14px Georgia';ctx.fillText('ELA ZOLO',x,top+26);ctx.restore();}
+ctx.save();ctx.fillStyle='#dec58d';ctx.textAlign='center';ctx.font='23px Georgia';ctx.fillText('ELA ZOLO · GALERIE',1510,-530);ctx.font='14px Georgia';ctx.fillText('Autorské šperky z Olomouce',1510,-506);ctx.restore();}
 const toolBounds={"tooth": [160, 57, 904, 1181], "candle": [56, 93, 1051, 1232], "ruler": [18, 265, 2137, 186], "file": [27, 216, 2117, 244]};
 function drawCompass(b){ctx.save();ctx.translate(b.x+b.w/2,b.y+12);ctx.lineCap='round';for(const sign of [-1,1]){ctx.beginPath();ctx.moveTo(sign*4,0);ctx.lineTo(sign*29,b.h-12);ctx.strokeStyle='#30383a';ctx.lineWidth=9;ctx.stroke();ctx.strokeStyle='#d1d1c6';ctx.lineWidth=4;ctx.stroke()}ctx.fillStyle='#a2aaab';ctx.beginPath();ctx.arc(0,0,11,0,7);ctx.fill();ctx.fillStyle='#263438';ctx.fillRect(-6,-1,12,2);ctx.restore()}
 function mist(x,y,r,alpha,color){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${color},${alpha})`);g.addColorStop(1,`rgba(${color},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)}
