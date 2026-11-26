@@ -2,6 +2,8 @@
 (()=>{
 const canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d'),$=s=>document.querySelector(s);
 const W=1200,H=680,GROUND=510,R=25;
+const hazardSites=[{stage:1,x:2440,upper:false},{stage:2,x:1780,upper:false},{stage:3,x:1350,upper:false},{stage:3,x:1560,upper:true}];
+let usedHazards=new Set();
 let END=4200,stage=1,portalFall=false,arrival=0,camY=0,checkpointY=485,endingTime=0,ending=false,toothTaken=false,upperReached=false;
 let vw=W,cam=0,last=0,t=0,state='loading',sound=false,audio,keys=new Set(),jump=false,angle=0,inv=0,toast=0,checkpoint=100;
 const img={}; const tablePlatforms=[{x:310,y:454,w:115,h:56},{x:465,y:385,w:280,h:125},{x:1100,y:432,w:150,h:78},{x:1740,y:300,w:230,h:210},{x:2190,y:446,w:130,h:64},{x:2360,y:373,w:170,h:137},{x:2550,y:440,w:70,h:70},{x:2620,y:380,w:50,h:130},{x:2670,y:325,w:310,h:185,dark:true},{x:3320,y:435,w:130,h:75},{x:3450,y:400,w:50,h:110},{x:3500,y:363,w:170,h:147},{x:3710,y:440,w:80,h:70},{x:3790,y:380,w:40,h:130},{x:3830,y:330,w:105,h:180},{x:4085,y:330,w:110,h:180}];
@@ -10,14 +12,14 @@ function setBarriers(){barriers=(stage===1?[{x:3090,y:430,w:60,h:80,kind:'plaste
 const shelfPlatforms=[{x:400,y:450,w:280,h:24,kind:'ruler'},{x:810,y:390,w:280,h:30,kind:'file'},{x:1210,y:445,w:280,h:24,kind:'ruler'},{x:1950,y:420,w:240,h:30,kind:'file'},
 {x:0,y:-190,w:780,h:45,kind:'shelf'},{x:860,y:-190,w:460,h:25,kind:'ruler'},{x:1390,y:-220,w:340,h:30,kind:'file'},{x:1800,y:-190,w:420,h:45,kind:'shelf'}];
 const shelfGemSeeds=[[520,410],[950,345],[1350,405],[2090,375],[2050,-235],[1560,-265],[1020,-235],[650,-235]];
-function enterShelf(){stage=3;END=2800;platforms=shelfPlatforms;CHAIN={x:2450,y:-570,length:1010,amplitude:.32,frequency:.72};p={x:120,y:485,vx:0,vy:0,ground:true,airJump:true,chainGrip:null,chainCooldown:1};gems=shelfGemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];warnings=[];birds=[];particles=[];setBarriers();checkpoint=120;checkpointY=485;cam=0;camY=0;nextDrop=2;nextBird=0;arrival=1;inv=2;keys.clear();jump=false;$('#chapter').textContent='03 / HORNÍ POLIČKY';hint('Doprava po poličce. Na konci vyšplhej a zhoupni se zpátky DOLEVA.',7);updateHUD()}
+function enterShelf(){stage=3;END=2800;platforms=shelfPlatforms;CHAIN={x:2450,y:-570,length:1010,amplitude:.32,frequency:.72};p={x:120,y:485,vx:0,vy:0,ground:true,airJump:true,chainGrip:null,chainCooldown:1};gems=shelfGemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];warnings=[];birds=[];particles=[];setBarriers();checkpoint=120;checkpointY=485;cam=0;camY=0;nextDrop=2;arrival=1;inv=2;keys.clear();jump=false;$('#chapter').textContent='03 / HORNÍ POLIČKY';hint('Doprava po poličce. Na konci vyšplhej a zhoupni se zpátky DOLEVA.',7);updateHUD()}
 
 const floorPlatforms=[{x:420,y:468,w:76,h:42,kind:'stone'},{x:680,y:420,w:90,h:90,kind:'ring'},{x:910,y:455,w:86,h:55,kind:'stone'},{x:1060,y:432,w:78,h:78,kind:'ring'},{x:1620,y:480,w:66,h:30,kind:'stone'},{x:1990,y:478,w:65,h:32,kind:'stone'},{x:2700,y:420,w:90,h:90,kind:'ring'},{x:2880,y:460,w:80,h:50,kind:'stone'},{x:3210,y:-330,w:230,h:35,kind:'shelf'}];
 const floorGemSeeds=[[320,463],[735,375],[1130,458],[1780,465],[2240,462],[2780,372]];
-function enterFloor(){stage=2;END=3500;CHAIN={x:3080,y:-430,length:820,amplitude:.22,frequency:.8};checkpointY=485;camY=0;setBarriers();platforms=floorPlatforms;portalFall=false;arrival=1;p={x:140,y:70,vx:0,vy:100,ground:false,airJump:true,chainGrip:null,chainCooldown:1};gems=floorGemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];warnings=[];birds=[];particles=[];checkpoint=140;barrier=true;nextDrop=3;cam=0;inv=2;keys.clear();jump=false;$('#chapter').textContent='02 / POD STOLEM';hint('Pod stolem! Přeskoč kamínky a prsteny. Sádru rozbij kutálením.',6);updateHUD()}
+function enterFloor(){document.body.classList.remove('snow');stage=2;END=3500;CHAIN={x:3080,y:-430,length:820,amplitude:.22,frequency:.8};checkpointY=485;camY=0;setBarriers();platforms=floorPlatforms;portalFall=false;arrival=1;p={x:140,y:70,vx:0,vy:100,ground:false,airJump:true,chainGrip:null,chainCooldown:1};gems=floorGemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];warnings=[];birds=[];particles=[];checkpoint=140;barrier=true;nextDrop=3;cam=0;inv=2;keys.clear();jump=false;$('#chapter').textContent='02 / POD STOLEM';hint('Pod stolem! Přeskoč kamínky a prsteny. Sádru rozbij kutálením.',6);updateHUD()}
 const gemSeeds=[[230,465],[600,335],[1040,472],[1520,317],[1850,250],[2440,325],[2800,275],[3630,315]];
 let p,gems,drops,particles,barrier,hearts,collected,warnings,nextDrop,birds,nextBird,birdWave,dropCount;
-function reset(){stage=1;END=4200;CHAIN={...TABLE_CHAIN};setBarriers();checkpointY=485;camY=0;endingTime=0;ending=false;toothTaken=false;upperReached=false;document.body.classList.remove('end-screen');document.body.classList.remove('finale');platforms=tablePlatforms;portalFall=false;arrival=0;$('#chapter').textContent='01 / NOČNÍ DÍLNA';p={x:100,y:GROUND-R,vx:0,vy:0,ground:true,airJump:true,chainGrip:null,chainCooldown:0};gems=gemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];birds=[];nextBird=0;birdWave=0;dropCount=0;particles=[];warnings=[];barrier=true;hearts=3;collected=0;nextDrop=3;checkpoint=100;cam=0;angle=0;inv=0;t=0;updateHUD()}
+function reset(){usedHazards.clear();document.body.classList.add('snow');stage=1;END=4200;CHAIN={...TABLE_CHAIN};setBarriers();checkpointY=485;camY=0;endingTime=0;ending=false;toothTaken=false;upperReached=false;document.body.classList.remove('end-screen');document.body.classList.remove('finale');platforms=tablePlatforms;portalFall=false;arrival=0;$('#chapter').textContent='01 / BÍLÉ KRÁLOVSTVÍ';p={x:100,y:GROUND-R,vx:0,vy:0,ground:true,airJump:true,chainGrip:null,chainCooldown:0};gems=gemSeeds.map(([x,y])=>({x,y,got:false}));drops=[];birds=[];nextBird=18;birdWave=0;dropCount=0;particles=[];warnings=[];barrier=true;hearts=3;collected=0;nextDrop=3;checkpoint=100;cam=0;angle=0;inv=0;t=0;updateHUD()}
 function updateHUD(){$('#score').textContent=`◆ ${collected} / 22`;$('#lives').textContent='♥ '.repeat(hearts)}
 function hint(s,d=3){$('#hint').textContent=s;toast=d}
 function tone(f=700,d=.12){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(f,audio.currentTime);o.frequency.exponentialRampToValueAtTime(f*.65,audio.currentTime+d);g.gain.setValueAtTime(.07,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+d)}catch{}}
@@ -65,15 +67,17 @@ if(stage===1&&p.x>1990&&checkpoint<1900){checkpoint=2020;hint('Záchytný bod. D
 if(stage===2&&p.x>1320&&checkpoint<1300){checkpoint=1340;hint('Pod skříní: pozor na padající obličeje.',4)}
 // Birds belong to the table and lower shelf, never the floor, ascent, or final platform.
 const birdsVisible=stage===1||(stage===3&&!upperReached&&p.y>180&&p.chainGrip===null&&camY>-90);
-if(!birdsVisible){birds=[];nextBird=0;}
+if(!birdsVisible){birds=[];}
 if(birdsVisible){
-if((nextBird-=dt)<=0){let wave=birdWave++,direction=wave%2? -1:1;birds.push({x:direction>0?-70:vw+70,y:0,baseY:[145,205,175,235][wave%4],vx:direction*(65+(wave%3)*20),phase:wave});nextBird=2.4}
+if(t>=nextBird){let wave=birdWave++,direction=wave%2? -1:1;birds.push({x:direction>0?-70:vw+70,y:0,baseY:[145,205,175,235][wave%4],vx:direction*(65+(wave%3)*20),phase:wave});nextBird=t+35+(wave%3)*5}
 for(const b of birds){b.x+=b.vx*dt;b.y=b.baseY+Math.sin(t*1.7+b.phase)*10}birds=birds.filter(b=>b.x> -120&&b.x<vw+120);
 }
-const dropZone=stage===1?p.x>800&&p.x<3750:stage===2?p.x>1450&&p.x<2960:p.x>550&&p.x<2180;
-if(dropZone&&!nearLongChain(p.x)&&p.chainGrip===null&&(nextDrop-=dt)<=0){let x=Math.max(80,Math.min(END-150,p.x+p.vx*.55)),kind=dropCount++%3===2?'stone':'mask',floor=GROUND,under=stage===2&&x>1400&&x<2300,from=under?330:p.y-470;
+// Four predictable locations, one falling head per location per game.
+for(let i=0;i<hazardSites.length;i++){const site=hazardSites[i];
+if(usedHazards.has(i)||site.stage!==stage||site.upper!==(p.y<0)||Math.abs(p.x-site.x)>170||nearLongChain(p.x)||p.chainGrip!==null)continue;
+let x=site.x,kind='mask',floor=GROUND,from=stage===2?330:p.y-400;
 for(const b of platforms)if(x>=b.x&&x<=b.x+b.w&&b.y>from+60)floor=Math.min(floor,b.y);
-if(!nearLongChain(x))warnings.push({x,kind,floor,from,time:1.25});nextDrop=stage===1?3.6:2.2}
+warnings.push({x,kind,floor,from,time:1.6});usedHazards.add(i);}
 
 warnings=warnings.filter(w=>!nearLongChain(w.x));drops=drops.filter(d=>!nearLongChain(d.x));
 for(const w of warnings)w.time-=dt;for(const w of warnings.filter(w=>w.time<=0))drops.push({x:w.x,kind:w.kind,floor:w.floor,y:w.from,vy:15,a:0});warnings=warnings.filter(w=>w.time>0);
@@ -84,7 +88,29 @@ if(stage===3&&p.y<-195&&Math.hypot(p.x-410,p.y+235)<55){toothTaken=true;ending=t
 
 
 for(const a of particles){a.x+=a.vx*dt;a.y+=a.vy*dt;a.vy+=500*dt;a.life-=dt}particles=particles.filter(a=>a.life>0);cam+=(Math.max(0,Math.min(END-vw,p.x-vw*.35))-cam)*Math.min(1,dt*5);let targetY=stage===1?0:Math.min(0,p.y-H*.57);camY+=(targetY-camY)*Math.min(1,dt*5)}
+
+const cardCache=new Map();let snowBackdrop;
+function paperRandom(seed){return()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
+function plaster(g,x,y,w,h,seed,density=1){const rand=paperRandom(seed);g.save();g.beginPath();g.rect(x,y,w,h);g.clip();for(let i=0;i<w*h*.035*density;i++){const px=x+rand()*w,py=y+rand()*h,r=.5+rand()*2.8;g.fillStyle=i%3?'rgba(125,119,104,.075)':'rgba(255,255,255,.65)';g.beginPath();g.ellipse(px,py,r*1.8,r,.3,0,7);g.fill();}g.restore()}
+function drawCardPlatform(b){let surface=cardCache.get(b);if(!surface){surface=document.createElement('canvas');surface.width=b.w+28;surface.height=b.h+24;const g=surface.getContext('2d'),x=14,y=7,w=b.w,h=b.h;
+g.fillStyle='#bcb8ae35';g.beginPath();g.ellipse(x+w/2,y+h+5,w*.55,7,0,0,7);g.fill();
+g.beginPath();g.moveTo(x+14,y);g.lineTo(x+w-14,y);g.quadraticCurveTo(x+w+2,y+2,x+w,y+17);g.lineTo(x+w,y+h-16);g.quadraticCurveTo(x+w,y+h,x+w-17,y+h);g.lineTo(x+17,y+h);g.quadraticCurveTo(x,y+h,x,y+h-16);g.lineTo(x,y+17);g.quadraticCurveTo(x-2,y+2,x+14,y);g.closePath();g.save();g.clip();
+const grad=g.createLinearGradient(x,y,x+w,y+h);grad.addColorStop(0,'#fffefa');grad.addColorStop(.55,'#eeeae2');grad.addColorStop(1,'#c8c4b9');g.fillStyle=grad;g.fillRect(x-3,y,w+6,h);plaster(g,x,y,w,h,b.x*37,2);
+for(let row=14;row<h;row+=13){g.strokeStyle='#a9a29277';g.lineWidth=1;g.beginPath();g.moveTo(x,y+row);for(let k=0;k<=w;k+=5)g.lineTo(x+k,y+row+Math.sin(k*.22+row)*1.5);g.stroke();g.strokeStyle='#fffdf3bb';g.beginPath();g.moveTo(x,y+row+2);g.lineTo(x+w,y+row+2);g.stroke();}
+g.restore();g.fillStyle='#faf9f2';g.beginPath();g.ellipse(x+w/2,y+5,w/2,9,0,0,7);g.fill();plaster(g,x+8,y-2,w-16,12,b.x+19,4);cardCache.set(b,surface);}ctx.drawImage(surface,b.x-14,b.y-7);}
+function drawSnowKingdom(){if(!snowBackdrop){snowBackdrop=document.createElement('canvas');snowBackdrop.width=1800;snowBackdrop.height=H;const g=snowBackdrop.getContext('2d');let sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#d9d6cc');sky.addColorStop(.65,'#f9f7ee');sky.addColorStop(1,'#d5d0c3');g.fillStyle=sky;g.fillRect(0,0,1800,H);
+// Soft distant rounded forms, like the latex-covered cardboard display.
+for(let i=0;i<10;i++){g.fillStyle=i%2?'#eeece3':'#e6e3da';g.beginPath();g.ellipse(i*210,460,150,90+(i%3)*30,0,0,7);g.fill();}
+// The large handmade crowned face from the shop window.
+g.save();g.translate(690,247);g.rotate(-.035);g.fillStyle='#bbb6a73b';g.beginPath();g.ellipse(6,7,155,151,0,0,7);g.fill();g.fillStyle='#f0eee5';g.beginPath();for(let i=0;i<=100;i++){let a=i/100*Math.PI*2,r=148+Math.sin(i*2.3)*2;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.save();g.clip();plaster(g,-155,-155,310,310,444,1.6);g.restore();
+g.strokeStyle='#d2cec1';g.lineWidth=9;for(const x of [-57,57]){g.beginPath();g.arc(x,-26,25,0,7);g.stroke();}g.beginPath();g.arc(0,24,69,.18,Math.PI-.18);g.stroke();for(let i=0;i<5;i++){g.fillStyle='#ddd9cc';g.beginPath();g.arc(-51+i*25,65+Math.sin(i/4*Math.PI)*18,11,0,7);g.fill();}
+let gold=g.createLinearGradient(-100,-200,100,-70);gold.addColorStop(0,'#b8a06a');gold.addColorStop(.5,'#f0dfab');gold.addColorStop(1,'#a88b51');g.fillStyle=gold;g.beginPath();g.moveTo(-108,-94);g.lineTo(-110,-212);g.lineTo(-50,-164);g.lineTo(0,-225);g.lineTo(51,-164);g.lineTo(110,-211);g.lineTo(108,-94);g.closePath();g.fill();g.restore();snowBackdrop.getContext('2d').fillStyle='#ffffff18';g.fillRect(0,0,1800,H);}
+ctx.drawImage(snowBackdrop,0,0,1800,H,-(cam*.17)%1800,0,1800,H);if(vw+cam*.17>1800)ctx.drawImage(snowBackdrop,1800-(cam*.17)%1800,0);
+ctx.fillStyle='#f5f2e8';ctx.fillRect(0,GROUND,vw,H-GROUND);ctx.fillStyle='#b3aa9766';ctx.fillRect(0,GROUND+9,vw,2);
+ctx.strokeStyle='#c0b8a744';ctx.lineWidth=1;for(let y=GROUND+24;y<H;y+=18){ctx.beginPath();for(let x=-20;x<vw+20;x+=8)ctx.lineTo(x,y+Math.sin((x+cam)*.04+y)*2);ctx.stroke();}}
+
 function metal(b){
+if(stage===1){drawCardPlatform(b);return;}
 if(b.kind==='shelf'){ctx.drawImage(img.cabinet,30,535,2090,50,b.x,b.y,b.w,b.h);return}
 if(b.kind==='ruler'||b.kind==='file'){drawTool(b);return}
 if(b.kind){let a=img[b.kind];if(b.kind==='ring')ctx.drawImage(a,54,46,1147,1171,b.x-3,b.y-2,b.w+6,b.h+4);else ctx.drawImage(a,b.x-3,b.y-2,b.w+6,b.h+4);return}
@@ -117,7 +143,7 @@ if(endingTime>3&&endingTime<5.3){const strength=Math.sin(Math.min(1,(endingTime-
 for(let i=0;i<42;i++){let u=((endingTime-3)*1.15+i*.618)%1,swirl=Math.sin(u*10+i*2.4),spread=5+u*24,x=mx-(mx-cx+65)*u,y=my+(cy-my-10)*u+swirl*spread;mist(x,y,6+u*18,strength*(1-u)*.075,'193,220,228');if(i%3===0){ctx.fillStyle=`rgba(234,238,225,${strength*(1-u)*.6})`;ctx.beginPath();ctx.ellipse(x,y,1.6,1,0,0,7);ctx.fill()}}
 ctx.restore();}
 }
-function draw(){ctx.clearRect(0,0,vw,H);if(!img.bench)return;let bg=stage===1?img.bench:img.floor;ctx.fillStyle='#0d1c20';ctx.fillRect(0,0,vw,H);if(stage!==3)ctx.drawImage(bg,0,0,bg.width,bg.height,0,stage===1?0:-camY,vw,H);ctx.save();ctx.globalAlpha=.78;for(const b of birds){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.sin(t*1.7+b.phase)*.06);ctx.scale(b.vx>0?1:-1,.9+Math.sin(t*9+b.phase)*.1);ctx.drawImage(img.bird,-38,-26,76,52);ctx.restore()}ctx.restore();ctx.save();ctx.translate(-cam,-camY);
+function draw(){ctx.clearRect(0,0,vw,H);if(!img.bench)return;let bg=stage===1?img.bench:img.floor;ctx.fillStyle='#0d1c20';ctx.fillRect(0,0,vw,H);if(stage===1)drawSnowKingdom();else if(stage===2)ctx.drawImage(bg,0,0,bg.width,bg.height,0,-camY,vw,H);ctx.save();ctx.globalAlpha=.78;for(const b of birds){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.sin(t*1.7+b.phase)*.06);ctx.scale(b.vx>0?1:-1,.9+Math.sin(t*9+b.phase)*.1);ctx.drawImage(img.bird,-38,-26,76,52);ctx.restore()}ctx.restore();ctx.save();ctx.translate(-cam,-camY);
 if(stage===2){ctx.fillStyle='#070b0cd9';ctx.fillRect(1400,320,900,190);ctx.drawImage(img.cabinet,20,137,2132,451,1400,25,900,305);ctx.fillStyle='#392b20';ctx.fillRect(1400,320,18,190);ctx.fillRect(2282,320,18,190);}
 if(stage===3){ctx.drawImage(img.cabinet,30,535,2090,50,0,GROUND,END,65);}
 for(const b of platforms)metal(b);
@@ -138,7 +164,7 @@ for(const d of drops){ctx.save();ctx.translate(d.x,d.y);ctx.rotate(d.a);if(d.kin
 
 ctx.fillStyle='#0005';ctx.beginPath();ctx.ellipse(p.x,GROUND+4,28,6,0,0,7);ctx.fill();if(inv<=0||Math.floor(t*12)%2)princess(p.x,p.y,angle);if(stage===3)drawFinale();
 for(const a of particles){ctx.globalAlpha=Math.max(0,a.life/.7);ctx.fillStyle=a.color;ctx.fillRect(a.x,a.y,3,3)}ctx.globalAlpha=1;
-ctx.font='12px Georgia';ctx.fillStyle='#e4d4b3';ctx.textAlign='center';for(const [x,y,s] of (stage===1?[[885,556,'PRUŽINA'],[1500,505,'CHYTNI SE · MEZERNÍK = ODSKOK'],[3120,555,'SÁDRA · SHIFT →'],[4010,585,'DOLŮ ZE STOLU']]:stage===2?[[730,560,'ZTRACENÉ PRSTENY'],[1810,560,'POD SKŘÍNÍ'],[2480,560,'SÁDRA · SHIFT →'],[3060,560,'↑ VYŠPLHEJ K POLIČCE'],[3320,-365,'DOPRAVA →']]:[[800,565,'PO POLIČCE DOPRAVA →'],[2390,565,'↑ ŠPLHEJ A ZHOUPNI SE DOLEVA'],[2020,-145,'← ZA ZLATÝM ZUBEM'],[1140,-145,'SHIFT + ←'],[420,-145,'ZLATÝ ZUB']]))ctx.fillText(s,x,y);ctx.restore();
+ctx.font='12px Georgia';ctx.fillStyle=stage===1?'#5e5547':'#e4d4b3';ctx.textAlign='center';for(const [x,y,s] of (stage===1?[[885,556,'PRUŽINA'],[1500,505,'CHYTNI SE · MEZERNÍK = ODSKOK'],[3120,555,'SÁDRA · SHIFT →'],[4010,585,'DOLŮ ZE STOLU']]:stage===2?[[730,560,'ZTRACENÉ PRSTENY'],[1810,560,'POD SKŘÍNÍ'],[2480,560,'SÁDRA · SHIFT →'],[3060,560,'↑ VYŠPLHEJ K POLIČCE'],[3320,-365,'DOPRAVA →']]:[[800,565,'PO POLIČCE DOPRAVA →'],[2390,565,'↑ ŠPLHEJ A ZHOUPNI SE DOLEVA'],[2020,-145,'← ZA ZLATÝM ZUBEM'],[1140,-145,'SHIFT + ←'],[420,-145,'ZLATÝ ZUB']]))ctx.fillText(s,x,y);ctx.restore();
 if(arrival>0){ctx.fillStyle=`rgba(5,12,15,${arrival})`;ctx.fillRect(0,0,vw,H)}
 let progress=p?Math.min(1,stage===3?(2+(upperReached?1-p.x/END:.5*p.x/END))/3:((stage-1)+p.x/END)/3):0;ctx.fillStyle='#d8bb7555';ctx.fillRect(0,H-3,vw,3);ctx.fillStyle='#e8cb87';ctx.fillRect(0,H-3,vw*progress,3);if(endingTime>5){ctx.fillStyle=`rgba(0,0,0,${Math.min(1,(endingTime-5)/2)})`;ctx.fillRect(0,0,vw,H)}}
 function frame(now){let dt=Math.min((now-last)/1000,.035);last=now;if(state==='playing'){let n=Math.ceil(dt/.008);for(let i=0;i<n;i++)if(state==='playing')update(dt/n)}if(p)draw();requestAnimationFrame(frame)}
